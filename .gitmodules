@@ -12,4 +12,4 @@
 	url = git@github.com:PyFlightCoach/FlightAnalysis.git
 [submodule "FlightPlotting"]
 	path = FlightPlotting
-	url = git@github.com:PyFlightCoach/FlightPlotting.git
+	url = git@github.com:kd0aij/FlightPlotting.git
