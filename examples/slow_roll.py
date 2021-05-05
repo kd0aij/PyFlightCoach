@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 
 import plotly.graph_objects as go
+import plotly.io as pio
 from flightanalysis import Section, State, FlightLine
 from flightanalysis.flightline import Box
 from flightdata import Flight, Fields
@@ -52,9 +53,35 @@ traces += tiptrace(sec, scale * 1.85, flightline.transform_to)
 traces += boxfrustumEdges()
 
 
+pio.templates["mw_flight3d"] = go.layout.Template(layout=go.Layout(
+    margin=dict(l=0, r=0, t=0, b=0),
+    scene=dict(
+        aspectmode='data',
+        xaxis=dict(showticklabels=True),
+        yaxis=dict(showticklabels=True),
+        zaxis=dict(showticklabels=True)
+    ),
+    legend=dict(
+        font=dict(size=20),
+        yanchor="top",
+        y=0.99,
+        xanchor="left",
+        x=0.01
+    )
+))
+
+pio.templates["mw_view"] = go.layout.Template(layout=go.Layout(
+    scene_camera=dict(
+        up=dict(x=0, y=0, z=1),
+        center=dict(x=0, y=0, z=0),
+        eye=dict(x=0.0, y=-1.0, z=0),
+        projection=dict(type='orthographic')
+    )
+))
+
 fig = go.Figure(
     traces,
-    layout=go.Layout(template="flight3d+judge_view")
+    layout=go.Layout(template="mw_flight3d+mw_view")
 )
 
 # save interactive figure
