@@ -15,6 +15,9 @@ from geometry import Point, Quaternion, Transformation
 import os
 import tkinter as tk
 
+# TODO: simulate wind and the resulting attitude changes to compensate
+# that should result in non-zero wca values from maneuverRPY in traces.py
+
 scale = 4
 obj = OBJ.from_obj_file('../data/models/ColdDraftF3APlane.obj').transform(Transformation(
     Point(0.75, 0, 0), Quaternion.from_euler(Point(np.pi, 0, -np.pi/2))
