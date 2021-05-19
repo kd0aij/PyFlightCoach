@@ -6,7 +6,7 @@ Created on Sun Apr  4 16:16:44 2021
 @author: markw
 """
 
-from flightanalysis import Section, FlightLine
+from flightanalysis import Section, FlightLine, State
 from flightanalysis.flightline import Box
 from flightdata import Flight
 import numpy as np
@@ -22,25 +22,42 @@ obj = OBJ.from_obj_file('/home/markw/linux_git/kd0aij/PyFlightCoach/data/models/
     )
 )
 
-# AAM East Field: FlightLine.from_covariance heading is off by 180 degrees
-#binfile = "P21_032521"
-binfile = "M21_032521"
-heading = np.radians(16)
-
-bin = Flight.from_log('/home/markw/linux_git/kd0aij/PyFlightCoach/data/logs/' + binfile + ".BIN")
-flightline = FlightLine.from_heading(bin, heading)
-flightline.to_json("AAMeast_flightline.json")
-
+# Thomas David's log
+FC_examples = '/mnt/c/Users/markw/GoogleDrive/blackbox_logs/FlightCoach/examples/logs/'
+binfile = '00000100'
+bin = Flight.from_log(FC_examples + binfile + '.BIN')
+origin = [51.4594504400,   -2.7912540674]
+heading = np.radians(148)
 box = Box(
         'heading',
         GPSPosition(
-            bin.data.iloc[0].global_position_latitude,
-            bin.data.iloc[0].global_position_longitude
+            origin[0],
+            origin[1]
         ),
         heading
     )
-box.to_json("AAMeast_box.json")
+box.to_json("TD_box.json")
 
+start = 108
+end = 154
+
+# AAM East Field: FlightLine.from_covariance heading is off by 180 degrees
+#binfile = "P21_032521"
+# binfile = "M21_032521"
+# bin = Flight.from_log('/home/markw/linux_git/kd0aij/PyFlightCoach/data/logs/' + binfile + ".BIN")
+# heading = np.radians(16)
+# pilot_box = [39.842288, -105.212928]
+# box = Box(
+#         'heading',
+#         GPSPosition(
+#             pilot_box[0],
+#             pilot_box[1]
+#         ),
+#         heading
+#     )
+# box.to_json("AAMeast_box.json")
+
+flightline = FlightLine.from_box(box)
 sec = Section.from_flight(bin, flightline)
 
 # examples
@@ -50,8 +67,11 @@ sec = Section.from_flight(bin, flightline)
 # bin = Flight.from_log('../../data/logs/' + binfile + ".BIN")
 # sec = Section.from_flight(bin, FlightLine.from_covariance(bin))
 
-start = 60
-end = 82
+# start = 275
+# end = 286
+# start = 60
+# end = 82
+
 subSec = sec.subset(start, end)
 
 span = 1.85
@@ -68,7 +88,14 @@ fig = go.Figure(
         ribbon(scale * span * .9, subSec, flightline.transform_to) +
         meshes(obj.scale(scale), numModels, subSec, 'orange', flightline.transform_to),
         layout=go.Layout(
-            margin=dict(autoexpand=True),
+            margin=dict(l=0, r=0, t=1, b=0, autoexpand=True),
+            legend=dict(
+                font=dict(size=20),
+                yanchor="top",
+                y=0.99,
+                xanchor="left",
+                x=0.01
+            ),
             scene=dict(aspectmode='data', camera_projection_type="orthographic")
         ))
 camera = dict(

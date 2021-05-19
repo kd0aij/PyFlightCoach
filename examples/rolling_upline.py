@@ -30,7 +30,7 @@ speed = length / duration
 # Y center of aerobatic box is 150 meters from pilot box, 135 meters from runway centerline
 # far edge is 160 meters from runway centerline for a 50m total depth
 initPos = Point(0, 160, 50)
-initQ = Quaternion.from_euler(Point(np.pi, -np.pi/2, 0)) # inverted upline
+initQ = Quaternion.from_euler(Point(np.pi, -np.pi/2, 0)) # noninverted upline
 initVel = Point(speed, 0, 0)
 initRates = Point(np.radians(360/duration), 0, 0)
 
