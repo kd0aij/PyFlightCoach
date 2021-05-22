@@ -83,7 +83,8 @@ sec = Section.from_flight(bin, flightline)
 subSec = sec.subset(start, end)
 
 mingspd = 10
-pThresh = np.pi/4
+# TODO: lower pitch thresholds seem to be best for reducing errors in calculated maneuver roll
+pThresh = np.radians(30)
 # TODO: why is flightline.transform_to the same as transform_from?
 [roll, pitch, wca, wca_axis] = genManeuverRPY(subSec, heading, mingspd, pThresh, flightline.transform_to)
 
@@ -96,7 +97,7 @@ numModels = int(dt)
 # use orthographic projection for rendering to canvas
 fig = go.Figure(
         #boxfrustum() +
-        boxfrustumEdges() +
+        # boxfrustumEdges() +
         tiptrace(subSec, scale * span, roll, pitch, wca) +
         ribbon(scale * span * .9, subSec, roll) +
         meshes(obj.scale(scale), numModels, subSec, 'orange', flightline.transform_to),
