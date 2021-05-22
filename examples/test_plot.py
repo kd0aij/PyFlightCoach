@@ -10,7 +10,9 @@ from flightanalysis import Section, FlightLine, State
 from flightanalysis.flightline import Box
 from flightdata import Flight
 import numpy as np
-from flightplotting.traces import tiptrace, meshes, ribbon, boxtrace, boxfrustum, boxfrustumEdges, create_3d_plot
+from math import pi
+from flightplotting.traces import tiptrace, meshes, ribbon, boxtrace, \
+    boxfrustum, boxfrustumEdges, create_3d_plot, genManeuverRPY, wrapPi
 from flightplotting.model import OBJ
 from geometry import Transformation, Point, Quaternion, Points, GPSPosition
 import plotly.graph_objects as go
@@ -27,7 +29,10 @@ FC_examples = '/mnt/c/Users/markw/GoogleDrive/blackbox_logs/FlightCoach/examples
 binfile = '00000100'
 bin = Flight.from_log(FC_examples + binfile + '.BIN')
 origin = [51.4594504400,   -2.7912540674]
-heading = np.radians(148)
+# runway heading from Octave (degrees CW from North)
+heading = np.radians(-122)
+# If pilot north is flightline heading:
+# heading = wrapPi(heading + pi/2)
 box = Box(
         'heading',
         GPSPosition(
@@ -37,6 +42,9 @@ box = Box(
         heading
     )
 box.to_json("TD_box.json")
+
+print("Runway heading (CW from North) is {:5.1f} (East) / {:5.1f} (West)".format(
+             np.degrees(heading), np.degrees(wrapPi(heading+pi))))
 
 start = 108
 end = 154
@@ -74,6 +82,11 @@ sec = Section.from_flight(bin, flightline)
 
 subSec = sec.subset(start, end)
 
+mingspd = 10
+pThresh = np.pi/4
+# TODO: why is flightline.transform_to the same as transform_from?
+[roll, pitch, wca, wca_axis] = genManeuverRPY(subSec, heading, mingspd, pThresh, flightline.transform_to)
+
 span = 1.85
 scale = 5
 dt = end - start
@@ -84,8 +97,8 @@ numModels = int(dt)
 fig = go.Figure(
         #boxfrustum() +
         boxfrustumEdges() +
-        tiptrace(subSec, scale * span, flightline.transform_to) +
-        ribbon(scale * span * .9, subSec, flightline.transform_to) +
+        tiptrace(subSec, scale * span, roll, pitch, wca) +
+        ribbon(scale * span * .9, subSec, roll) +
         meshes(obj.scale(scale), numModels, subSec, 'orange', flightline.transform_to),
         layout=go.Layout(
             margin=dict(l=0, r=0, t=1, b=0, autoexpand=True),
