@@ -91,9 +91,10 @@ pThresh = np.radians(60)
 
 span = 1.85
 scale = 5
-dt = end - start
-# draw models 1 second apart
-numModels = 2*int(dt)
+duration = end - start
+# draw models mdt seconds apart
+mdt = 1
+numModels = round(mdt * int(duration))
 
 # use orthographic projection for rendering to canvas
 fig = go.Figure(
@@ -101,9 +102,9 @@ fig = go.Figure(
         boxfrustumEdges() +
         tiptrace(subSec, scale * span, roll, pitch, wca) +
         ribbon(scale * span * .9, subSec, roll) +
-        meshes(obj.scale(scale), numModels, subSec, roll),
+        meshes(obj.scale(scale), numModels, subSec, roll, pitch, wca),
         layout=go.Layout(
-            margin=dict(l=0, r=0, t=1, b=0, autoexpand=True),
+            margin=dict(autoexpand=True),
             legend=dict(
                 font=dict(size=20),
                 yanchor="top",
@@ -116,8 +117,9 @@ fig = go.Figure(
 camera = dict(
     eye=dict(x=0, y=-2.5, z=0)
 )
-fig.update_layout(scene_camera=camera, title=binfile)
-#fig.update_layout(showlegend=False)
+fig.update_layout(scene_camera=camera, title=binfile,
+                hoverdistance=60)
+fig.update_scenes(xaxis_showspikes=False, yaxis_showspikes=False, zaxis_showspikes=False)
 
 # save interactive figure
 from pathlib import Path
