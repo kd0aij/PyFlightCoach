@@ -6,10 +6,10 @@
 	url = git@github.com:PyFlightCoach/FlightData.git
 [submodule "geometry"]
 	path = geometry
-	url = git@github.com:PyFlightCoach/geometry.git
+	url = git@github.com:kd0aij/geometry.git
 [submodule "FlightAnalysis"]
 	path = FlightAnalysis
-	url = git@github.com:PyFlightCoach/FlightAnalysis.git
+	url = git@github.com:kd0aij/FlightAnalysis.git
 [submodule "FlightPlotting"]
 	path = FlightPlotting
 	url = git@github.com:kd0aij/FlightPlotting.git
