@@ -24,42 +24,42 @@ obj = OBJ.from_obj_file('/home/markw/linux_git/kd0aij/PyFlightCoach/data/models/
     )
 )
 
-# # Thomas David's log
-# # FC_examples = '/mnt/c/Users/markw/GoogleDrive/blackbox_logs/FlightCoach/examples/logs/'
-# binfile = '00000100'
-# # flight = Flight.from_log(FC_examples + binfile + '.BIN')
-# # flight.to_csv('data/logs/flight_csvs/100.csv')
-# flight = Flight.from_csv('data/logs/flight_csvs/100.csv')
-# origin = [51.4594504400,   -2.7912540674]
-# pilot_box = GPSPosition(origin[0], origin[1])
-# # pilot north is roughly SE
-# heading = np.radians(148)
+# Thomas David's log
+# FC_examples = '/mnt/c/Users/markw/GoogleDrive/blackbox_logs/FlightCoach/examples/logs/'
+binfile = '00000100'
+# flight = Flight.from_log(FC_examples + binfile + '.BIN')
+# flight.to_csv('data/logs/flight_csvs/100.csv')
+flight = Flight.from_csv('data/logs/flight_csvs/100.csv')
+firstGPSpos = flight.origin()
+print("firstGPS position:", firstGPSpos)
 
-# start = 108
-# end = 154
-# # start = 500
-# # end = 600
+pilot_box = GPSPosition(51.4594504400, -2.7912540674)
+# pilot north is roughly SE
+heading = np.radians(148)
 
-# AAM East Field: FlightLine.from_covariance heading is off by 180 degrees
-binfile = "P21_032521"
-# binfile = "M21_032521"
-flight = Flight.from_log('/home/markw/linux_git/kd0aij/PyFlightCoach/data/logs/' + binfile + ".BIN")
-# pilot north is 16 degrees East of North
-heading = np.radians(16)
-# heading = np.radians(106)
-pilot_box = GPSPosition(39.842288, -105.212928)
+start = 108
+end = 154
+# start = 500
+# end = 600
 
+# # AAM East Field: FlightLine.from_covariance heading is off by 180 degrees
+# binfile = "P21_032521"
+# # binfile = "M21_032521"
+# flight = Flight.from_log('/home/markw/linux_git/kd0aij/PyFlightCoach/data/logs/' + binfile + ".BIN")
+# # pilot north is 16 degrees East of North
+# heading = np.radians(16)
+# # heading = np.radians(106)
+# pilot_box = GPSPosition(39.842288, -105.212928)
 
+# # start = 275
+# # end = 286
+# # start = 60
+# # end = 82
+# start = 82
+# end = 142
 
-print("Runway heading (CW from North) is {:5.1f} (East) / {:5.1f} (West)".format(
-             np.degrees(heading), np.degrees(wrapPi(heading+pi))))
-
-# start = 275
-# end = 286
-# start = 60
-# end = 82
-start = 82
-end = 142
+print("Pilot North (CW from North) is {:5.1f}".format(np.degrees(heading)))
+print("pilot position: ({:f}, {:f})".format(pilot_box.latitude, pilot_box.longitude))
 
 box = Box('heading', pilot_box, heading)
 flightline = FlightLine.from_box(box)
