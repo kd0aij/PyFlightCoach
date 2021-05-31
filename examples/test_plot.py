@@ -25,53 +25,34 @@ obj = OBJ.from_obj_file('/home/markw/linux_git/kd0aij/PyFlightCoach/data/models/
 )
 
 # # Thomas David's log
-# FC_examples = '/mnt/c/Users/markw/GoogleDrive/blackbox_logs/FlightCoach/examples/logs/'
+# # FC_examples = '/mnt/c/Users/markw/GoogleDrive/blackbox_logs/FlightCoach/examples/logs/'
 # binfile = '00000100'
-# bin = Flight.from_log(FC_examples + binfile + '.BIN')
+# # flight = Flight.from_log(FC_examples + binfile + '.BIN')
+# # flight.to_csv('data/logs/flight_csvs/100.csv')
+# flight = Flight.from_csv('data/logs/flight_csvs/100.csv')
 # origin = [51.4594504400,   -2.7912540674]
-# # runway heading from Octave (degrees CW from North)
-# heading = np.radians(-122)
-# # If pilot north is flightline heading:
-# # heading = wrapPi(heading + pi/2)
-# box = Box(
-#         'heading',
-#         GPSPosition(
-#             origin[0],
-#             origin[1]
-#         ),
-#         heading
-#     )
-# box.to_json("TD_box.json")
+# pilot_box = GPSPosition(origin[0], origin[1])
+# # pilot north is roughly SE
+# heading = np.radians(148)
 
 # start = 108
 # end = 154
-# start = 500
-# end = 600
+# # start = 500
+# # end = 600
 
 # AAM East Field: FlightLine.from_covariance heading is off by 180 degrees
 binfile = "P21_032521"
 # binfile = "M21_032521"
-bin = Flight.from_log('/home/markw/linux_git/kd0aij/PyFlightCoach/data/logs/' + binfile + ".BIN")
-# heading = np.radians(16)
-heading = np.radians(106)
-pilot_box = [39.842288, -105.212928]
-box = Box(
-        'heading',
-        GPSPosition(
-            pilot_box[0],
-            pilot_box[1]
-        ),
-        heading
-    )
-# box.to_json("AAMeast_box.json")
+flight = Flight.from_log('/home/markw/linux_git/kd0aij/PyFlightCoach/data/logs/' + binfile + ".BIN")
+# pilot north is 16 degrees East of North
+heading = np.radians(16)
+# heading = np.radians(106)
+pilot_box = GPSPosition(39.842288, -105.212928)
 
 
 
 print("Runway heading (CW from North) is {:5.1f} (East) / {:5.1f} (West)".format(
              np.degrees(heading), np.degrees(wrapPi(heading+pi))))
-
-flightline = FlightLine.from_box(box)
-sec = Section.from_flight(bin, flightline)
 
 # start = 275
 # end = 286
@@ -80,21 +61,23 @@ sec = Section.from_flight(bin, flightline)
 start = 82
 end = 142
 
+box = Box('heading', pilot_box, heading)
+flightline = FlightLine.from_box(box)
+sec = Section.from_flight(flight, flightline)
+
 subSec = sec.subset(start, end)
 
 mingspd = 10
 # TODO: lower pitch thresholds seem to be best for reducing errors in calculated maneuver roll
-# this seems to indicate that the ground course computing in genManeuverRPY is not correct.
-pThresh = np.radians(60)
-# TODO: why is flightline.transform_to the same as transform_from?
-[roll, pitch, wca, wca_axis] = genManeuverRPY(subSec, heading, mingspd, pThresh, flightline.transform_to)
+# this seems to indicate that the ground course computed in genManeuverRPY is not correct
+pThresh = np.radians(30)
+[roll, pitch, wca, wca_axis] = genManeuverRPY(subSec, mingspd, pThresh)
 
 span = 1.85
 scale = 5
 duration = end - start
 # draw models mdt seconds apart
 mdt = 1
-numModels = round(mdt * int(duration))
 
 # use orthographic projection for rendering to canvas
 fig = go.Figure(
@@ -102,7 +85,7 @@ fig = go.Figure(
         boxfrustumEdges() +
         tiptrace(subSec, scale * span, roll, pitch, wca) +
         ribbon(scale * span * .9, subSec, roll) +
-        meshes(obj.scale(scale), numModels, subSec, roll, pitch, wca),
+        meshes(obj.scale(scale), mdt, subSec, roll, pitch, wca),
         layout=go.Layout(
             margin=dict(autoexpand=True),
             legend=dict(
@@ -125,33 +108,6 @@ fig.update_scenes(xaxis_showspikes=False, yaxis_showspikes=False, zaxis_showspik
 from pathlib import Path
 basepath = str(Path.home()) + "/temp/"
 fname = "%s_%s-%s.html" % (binfile, start, end)
+print("writing 3D plot: " + basepath + fname)
 fig.write_html(basepath + fname)
 fig.show()
-
-# # create and save 3-views
-# import plotly.io as pio
-# pio.renderers.default = 'svg'
-
-# name = 'X view'
-# camera = dict(
-#     eye=dict(x=2.5, y=0, z=0)
-# )
-# fig.update_layout(scene_camera=camera, title_text=name)
-# fig.write_image(basepath + "Xview.svg")
-# #fig.show()
-
-# name = 'Y view'
-# camera = dict(
-#     eye=dict(x=0, y=2.5, z=0)
-# )
-# fig.update_layout(scene_camera=camera, title=name)
-# fig.write_image(basepath + "Yview.svg")
-# #fig.show()
-
-# name = 'Z View'
-# camera = dict(
-#     eye=dict(x=0, y=0, z=2.5)
-# )
-# fig.update_layout(scene_camera=camera, title=name)
-# fig.write_image(basepath + "Zview.svg")
-# #fig.show()
