@@ -26,10 +26,19 @@ obj = OBJ.from_obj_file('/home/markw/linux_git/kd0aij/PyFlightCoach/data/models/
 
 # Thomas David's log
 # FC_examples = '/mnt/c/Users/markw/GoogleDrive/blackbox_logs/FlightCoach/examples/logs/'
-binfile = '00000100'
-# flight = Flight.from_log(FC_examples + binfile + '.BIN')
+# flight = Flight.from_log(FC_examples + logfile + '.BIN')
 # flight.to_csv('data/logs/flight_csvs/100.csv')
-flight = Flight.from_csv('data/logs/flight_csvs/100.csv')
+
+# vertical 8
+# logfile = '100'
+# start = 108
+# end = 154
+
+logfile = '141'
+start = 221
+end = 242
+
+flight = Flight.from_csv('data/logs/flight_csvs/'+ logfile + '.csv')
 firstGPSpos = flight.origin()
 print("firstGPS position:", firstGPSpos)
 
@@ -37,15 +46,10 @@ pilot_box = GPSPosition(51.4594504400, -2.7912540674)
 # pilot north is roughly SE
 heading = np.radians(148)
 
-start = 108
-end = 154
-# start = 500
-# end = 600
-
 # # AAM East Field: FlightLine.from_covariance heading is off by 180 degrees
-# binfile = "P21_032521"
-# # binfile = "M21_032521"
-# flight = Flight.from_log('/home/markw/linux_git/kd0aij/PyFlightCoach/data/logs/' + binfile + ".BIN")
+# logfile = "P21_032521"
+# # logfile = "M21_032521"
+# flight = Flight.from_log('/home/markw/linux_git/kd0aij/PyFlightCoach/data/logs/' + logfile + ".BIN")
 # # pilot north is 16 degrees East of North
 # heading = np.radians(16)
 # # heading = np.radians(106)
@@ -100,14 +104,15 @@ fig = go.Figure(
 camera = dict(
     eye=dict(x=0, y=-2.5, z=0)
 )
-fig.update_layout(scene_camera=camera, title=binfile,
+fig.update_layout(scene_camera=camera, title="log: {:s}, time range: {:5.1f}-{:5.1f}".format(
+                logfile, start, end),
                 hoverdistance=60)
 fig.update_scenes(xaxis_showspikes=False, yaxis_showspikes=False, zaxis_showspikes=False)
 
 # save interactive figure
 from pathlib import Path
 basepath = str(Path.home()) + "/temp/"
-fname = "%s_%s-%s.html" % (binfile, start, end)
+fname = "%s_%s-%s.html" % (logfile, start, end)
 print("writing 3D plot: " + basepath + fname)
 fig.write_html(basepath + fname)
 fig.show()
