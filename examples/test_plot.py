@@ -24,7 +24,8 @@ obj = OBJ.from_obj_file('/home/markw/linux_git/kd0aij/PyFlightCoach/data/models/
     )
 )
 
-testNum = 1
+testNum = 4
+box = None
 
 # the heading in the box.json file must be a compass heading:
 # direction pilot is facing in degrees CW from true North
@@ -68,11 +69,18 @@ elif testNum == 3:
     start = 268
     end = 288
 
-flight = Flight.from_csv('data/logs/flight_csvs/'+ logfile + '.csv')
-firstGPSpos = flight.origin()
-print("firstGPS position:", firstGPSpos)
+elif testNum == 4:
+    logfile = 'maneuver' #'cross-box-humpty'
+    box = Box('test', GPSPosition(39.8420194, -105.2123333), 90)
+    start = 0
+    end = 30
 
-box = Box.from_json('examples/' + pbox + '.json')
+flight = Flight.from_csv('data/logs/flight_csvs/'+ logfile + '.csv')
+# firstGPSpos = flight.origin()
+# print("firstGPS position:", firstGPSpos)
+
+if box == None:
+    box = Box.from_json('examples/' + pbox + '.json')
 
 print("Pilot North (CW from North): {:5.1f}".format(np.degrees(box.heading)))
 print("pilot position: ", box.pilot_position)
